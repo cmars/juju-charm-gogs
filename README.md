@@ -40,4 +40,4 @@ installed by this charm.
 Cmars Technologies, LLC.
 
 Email: charmed at cmars.tech
-IRC: cmars on FreeNode.
+IRC: cmars on FreeNode

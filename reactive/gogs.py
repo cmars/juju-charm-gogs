@@ -94,7 +94,8 @@ def setup():
 
 @when("website.changed")
 def website_available(website):
-    website.configure(3000)
+    conf = hookenv.config()
+    website.configure(conf['http_port'])
 
 
 def restart_service():
