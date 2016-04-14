@@ -1,6 +1,7 @@
 includes:
  - 'layer:basic'
  - 'interface:pgsql'
+ - 'interface:http'
 options:
     basic:
         packages:
