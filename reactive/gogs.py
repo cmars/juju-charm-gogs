@@ -31,7 +31,7 @@ def install():
     for dir in ('.ssh', 'repositories', 'data', 'logs'):
         os.makedirs(os.path.join("/opt/gogs", dir), mode=0o700, exist_ok=True)
         shutil.chown(os.path.join("/opt/gogs", dir), user="gogs", group="gogs")
-    os.makedirs("/opt/gogs/custom/conf", mode=0o700, exist_ok=True)
+    os.makedirs("/opt/gogs/custom/conf", mode=0o755, exist_ok=True)
     shutil.chown("/opt/gogs/custom/conf", user="gogs", group="gogs")
 
     render(source='upstart',
