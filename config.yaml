@@ -1,0 +1,28 @@
+options:
+  title:
+    type: string
+    description: App name that shows up on every page title
+    default: "Go Git Service"
+  run_mode:
+    type: string
+    description: Either "dev", "prod" or "test"
+    default: prod
+  force_private:
+    type: boolean
+    description: Force every new repository to be private
+    default: false
+  version:
+    type: string
+    description: Gogs version to install
+    default: '0.9.13'
+  host:
+    type: string
+    description: External host name
+  http_port:
+    type: int
+    description: HTTP port for web application
+    default: 3000
+  ssh_port:
+    type: int
+    description: SSH port for git repository access
+    default: 3022

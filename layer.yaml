@@ -1,0 +1,8 @@
+includes:
+ - 'layer:basic'
+ - 'interface:pgsql'
+options:
+    basic:
+        packages:
+         - '--no-install-recommends'
+         - git

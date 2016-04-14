@@ -1,0 +1,15 @@
+description "gogs service"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+respawn
+
+setuid gogs
+setgid gogs
+
+chdir /opt/gogs
+env HOME=/opt/gogs/.ssh
+env USER=gogs
+
+exec /opt/gogs/gogs web --config /opt/gogs/custom/conf/app.ini
+

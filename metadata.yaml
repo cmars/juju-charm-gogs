@@ -1,0 +1,17 @@
+name: gogs
+summary: Go Git Service
+description: |
+    A painless self-hosted Git service.
+tags:
+ - applications
+ - git
+maintainer: "Cmars Technologies, LLC <charmed@cmars.tech>"
+requires:
+    db:
+        interface: pgsql
+provides:
+    website:
+        interface: http
+series:
+ - trusty
+ - xenial
