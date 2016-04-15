@@ -13,9 +13,6 @@ $(JUJU_REPOSITORY)/%/gogs:
 push:
 	charm push $(JUJU_REPOSITORY)/trusty/gogs $(CHARM)
 
-publish:
-	charm publish --channel stable $(CHARM)
-
 grant:
 	charm grant $(CHARM) --acl read everyone
 
