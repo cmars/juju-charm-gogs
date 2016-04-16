@@ -2,6 +2,7 @@ includes:
  - 'layer:basic'
  - 'interface:pgsql'
  - 'interface:http'
+repo: https://github.com:cmars/juju-charm-gogs.git
 options:
     basic:
         packages:

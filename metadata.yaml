@@ -5,7 +5,7 @@ description: |
 tags:
  - applications
  - git
-maintainer: "Cmars Technologies, LLC <charmed@cmars.tech>"
+maintainer: Casey Marshall <charmed@cmars.tech>
 requires:
     db:
         interface: pgsql

@@ -11,7 +11,7 @@ from charmhelpers.payload.archive import extract_tarfile
 from charmhelpers.core.unitdata import kv
 
 
-INSTALL_URL="https://cdn.gogs.io/gogs_v%s_linux_amd64.tar.gz"
+INSTALL_URL = "https://cdn.gogs.io/gogs_v%s_linux_amd64.tar.gz"
 
 
 @hook('install')
@@ -23,11 +23,11 @@ def install():
     handler.download(INSTALL_URL % version, dest='/opt/gogs.tar.gz')
 
     extract_tarfile('/opt/gogs.tar.gz', destpath="/opt")
- 
+
     # Create gogs user & group
     add_group("gogs")
     adduser("gogs", system_user=True)
-    
+
     for dir in ('.ssh', 'repositories', 'data', 'logs'):
         os.makedirs(os.path.join("/opt/gogs", dir), mode=0o700, exist_ok=True)
         shutil.chown(os.path.join("/opt/gogs", dir), user="gogs", group="gogs")
@@ -62,9 +62,10 @@ def db_available(db):
         'password': db.password(),
         'database': db.database(),
     })
-    setup() 
+    setup()
     remove_state("db.database.available")
- 
+
+
 def setup():
     unit_data = kv()
     if not unit_data.get('db'):
