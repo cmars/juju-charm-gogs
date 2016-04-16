@@ -40,8 +40,8 @@ relations:
         if not gogs_info:
             raise Exception("missing gogs service unit")
         addr = gogs_info[0]['public-address']
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((addr, 3000))
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect((addr, 3000))
 
 
 def deploy(bundle_yaml):
