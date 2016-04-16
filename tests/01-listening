@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
 import json
+import os
 import socket
+import tempfile
 import time
 import unittest
 from subprocess import check_call, check_output
@@ -9,20 +11,49 @@ from subprocess import check_call, check_output
 
 class TestDeployment(unittest.TestCase):
     def setUp(self):
-        check_call(['juju', 'deploy', 'cs:~cmars/gogs'])
-        check_call(['juju', 'deploy', 'postgresql'])
-        check_call(['juju', 'add-relation', 'gogs', 'postgresql:db'])
-        wait_for('gogs')
+        version = check_output(['juju', 'version'], universal_newlines=True)
+        if version < '2':
+            raise Exception('only Juju 2.0 or newer is tested')
+
+        deploy("""
+series: trusty
+services:
+  test-gogs:
+    # TODO: need to open a Juju 2.0 bug
+    # Can't seem to deploy a multiseries charm here (cs:~cmars/gogs)
+    charm: local:trusty/gogs
+    expose: True
+    num_units: 1
+  test-gogs-db:
+    charm: cs:trusty/postgresql
+    num_units: 1
+relations:
+  - - test-gogs:db
+    - test-gogs-db:db
+""")
+        wait_for('test-gogs')
 
     def test_something_is_listening(self):
         out = check_output(['juju', 'status', '--format', 'json'], universal_newlines=True)
         juju_status = json.loads(out)
-        gogs_info = [x for x in juju_status.get('services', {}).get('gogs', {}).get('units', {}).values()]
+        gogs_info = [x for x in juju_status.get('services', {}).get('test-gogs', {}).get('units', {}).values()]
         if not gogs_info:
             raise Exception("missing gogs service unit")
         addr = gogs_info[0]['public-address']
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((addr, 3000))
+
+
+def deploy(bundle_yaml):
+    f = tempfile.NamedTemporaryFile(suffix=".yaml", mode='w', encoding='utf-8', delete=False)
+    try:
+        print(bundle_yaml, file=f)
+    finally:
+        f.close()
+    try:
+        check_call(['juju', 'deploy', f.name])
+    finally:
+        os.unlink(f.name)
 
 
 def wait_for(svc, req_status='active', timeout=900):
