@@ -27,6 +27,9 @@ services:
   test-gogs-db:
     charm: cs:trusty/postgresql
     num_units: 1
+  test-gogs-proxy:
+    charm: cs:trusty/haproxy
+    num_units: 1
 relations:
   - - test-gogs:db
     - test-gogs-db:db
@@ -40,8 +43,17 @@ relations:
         if not gogs_info:
             raise Exception("missing gogs service unit")
         addr = gogs_info[0]['public-address']
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.connect((addr, 3000))
+
+        for i in range(10):
+            try:
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((addr, 3000))
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                    s.connect((addr, 3022))
+                return
+            except:
+                time.sleep(1)
+        raise Exception("failed to connect")
 
 
 def deploy(bundle_yaml):
@@ -56,14 +68,14 @@ def deploy(bundle_yaml):
         os.unlink(f.name)
 
 
-def wait_for(svc, req_status='active', timeout=900):
-    for i in range(0, timeout, 5):
+def wait_for(svc, req_status='active', timeout=900, delay=5):
+    for i in range(0, timeout, delay):
+        time.sleep(delay)
         out = check_output(['juju', 'status', '--format', 'json'], universal_newlines=True)
         juju_status = json.loads(out)
         svc_status = juju_status.get('services', {}).get(svc, {}).get('service-status', {}).get('current')
         if svc_status == req_status:
             return
-        time.sleep(5)
     raise Exception("timeout waiting for %s to reach %s status" % (svc, req_status))
 
 
