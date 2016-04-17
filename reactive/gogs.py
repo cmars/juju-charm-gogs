@@ -93,7 +93,7 @@ def setup():
     hookenv.status_set('active', 'ready')
 
 
-@when("website.changed")
+@when("website.available")
 def website_available(website):
     conf = hookenv.config()
     website.configure(conf['http_port'])

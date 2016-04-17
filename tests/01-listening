@@ -19,21 +19,18 @@ class TestDeployment(unittest.TestCase):
 series: trusty
 services:
   test-gogs:
-    # TODO: need to open a Juju 2.0 bug
+    # See https://pad.lv/1571254
     # Can't seem to deploy a multiseries charm here (cs:~cmars/gogs)
-    charm: local:trusty/gogs
+    charm: %(JUJU_REPOSITORY)s/trusty/gogs
     expose: True
     num_units: 1
   test-gogs-db:
     charm: cs:trusty/postgresql
     num_units: 1
-  test-gogs-proxy:
-    charm: cs:trusty/haproxy
-    num_units: 1
 relations:
   - - test-gogs:db
     - test-gogs-db:db
-""")
+""" % os.environ)
         wait_for('test-gogs')
 
     def test_something_is_listening(self):
