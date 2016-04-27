@@ -37,7 +37,5 @@ installed by this charm.
 
 ## Contact
 
-Cmars Technologies, LLC.
-
 Email: charmed at cmars.tech
 IRC: cmars on FreeNode

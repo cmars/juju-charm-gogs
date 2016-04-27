@@ -55,7 +55,7 @@ def config_changed():
 @when("db.database.available")
 def db_available(db):
     unit_data = kv()
-    unit_data.set('db', {
+    unit_data.set('gogs.db', {
         'host': db.host(),
         'port': db.port(),
         'user': db.user(),
@@ -68,26 +68,31 @@ def db_available(db):
 
 def setup():
     unit_data = kv()
-    if not unit_data.get('db'):
+    if not unit_data.get('gogs.db'):
         hookenv.status_set('blocked', 'need relation to postgresql')
         return
 
-    secret_key = unit_data.get('secret_key')
+    secret_key = unit_data.get('gogs.secret_key')
     if not secret_key:
         secret_key = base64.b64encode(os.urandom(32)).decode('utf-8')
-        unit_data.set('secret_key', secret_key)
+        unit_data.set('gogs.secret_key', secret_key)
 
     conf = hookenv.config()
     if not conf.get('host'):
         conf['host'] = hookenv.unit_public_ip()
+
+    root = unit_data.get('gogs.root', '')
+    if root and not root.endswith('/'):
+        root = root + '/'
 
     render(source='app.ini',
         target="/opt/gogs/custom/conf/app.ini",
         perms=0o644,
         context={
             'conf': conf,
-            'db': unit_data.get('db'),
+            'db': unit_data.get('gogs.db'),
             'secret_key': secret_key,
+            'root': root,
         })
     restart_service()
     hookenv.status_set('active', 'ready')
