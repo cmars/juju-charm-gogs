@@ -17,7 +17,7 @@ INSTALL_URL = "https://cdn.gogs.io/gogs_v%s_linux_amd64.tar.gz"
 @hook('install')
 def install():
     conf = hookenv.config()
-    version = conf.get('version', '0.9.13')
+    version = conf.get('version', '0.9.97')
 
     handler = archiveurl.ArchiveUrlFetchHandler()
     handler.download(INSTALL_URL % version, dest='/opt/gogs.tar.gz')
