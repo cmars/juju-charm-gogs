@@ -1,6 +1,7 @@
 import base64
 import os
 import shutil
+import re
 
 from charms.reactive import hook, when, when_not, set_state, remove_state, is_state
 from charmhelpers.core import hookenv
@@ -11,7 +12,11 @@ from charmhelpers.payload.archive import extract_tarfile
 from charmhelpers.core.unitdata import kv
 
 
-INSTALL_URL = "https://cdn.gogs.io/gogs_v%s_linux_amd64.tar.gz"
+def create_url(version):
+    url = "https://cdn.gogs.io/gogs_%s_linux_amd64.tar.gz"
+    vpart = 'v' + version if re.match(r'\d+(\.\d+)+', version) else version
+
+    return url % vpart
 
 
 @hook('install')
@@ -20,7 +25,7 @@ def install():
     version = conf.get('version', '0.9.97')
 
     handler = archiveurl.ArchiveUrlFetchHandler()
-    handler.download(INSTALL_URL % version, dest='/opt/gogs.tar.gz')
+    handler.download(create_url(version), dest='/opt/gogs.tar.gz')
 
     extract_tarfile('/opt/gogs.tar.gz', destpath="/opt")
 
@@ -35,9 +40,9 @@ def install():
     shutil.chown("/opt/gogs/custom/conf", user="gogs", group="gogs")
 
     render(source='upstart',
-        target="/etc/init/gogs.conf",
-        perms=0o644,
-        context={})
+           target="/etc/init/gogs.conf",
+           perms=0o644,
+           context={})
     hookenv.status_set('maintenance', 'installation complete')
 
 
@@ -86,14 +91,14 @@ def setup():
         root = root + '/'
 
     render(source='app.ini',
-        target="/opt/gogs/custom/conf/app.ini",
-        perms=0o644,
-        context={
-            'conf': conf,
-            'db': unit_data.get('gogs.db'),
-            'secret_key': secret_key,
-            'root': root,
-        })
+           target="/opt/gogs/custom/conf/app.ini",
+           perms=0o644,
+           context={
+               'conf': conf,
+               'db': unit_data.get('gogs.db'),
+               'secret_key': secret_key,
+               'root': root,
+           })
     restart_service()
     hookenv.status_set('active', 'ready')
 
