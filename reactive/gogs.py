@@ -61,11 +61,11 @@ def config_changed():
 def db_available(db):
     unit_data = kv()
     unit_data.set('gogs.db', {
-        'host': db.host(),
-        'port': db.port(),
-        'user': db.user(),
-        'password': db.password(),
-        'database': db.database(),
+        'host': db.master.host,
+        'port': db.master.port,
+        'user': db.master.user,
+        'password': db.master.password,
+        'database': db.master.dbname,
     })
     setup()
     remove_state("db.database.available")
