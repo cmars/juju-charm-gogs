@@ -43,6 +43,10 @@ def install():
            target="/etc/init/gogs.conf",
            perms=0o644,
            context={})
+    render(source='gogs.service',
+           target="/lib/systemd/system/gogs.service",
+           perms=0o644,
+           context={})
     hookenv.status_set('maintenance', 'installation complete')
 
 
