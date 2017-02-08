@@ -4,12 +4,12 @@ start on runlevel [2345]
 stop on runlevel [!2345]
 respawn
 
-setuid gogs
-setgid gogs
+setuid {{ user }}
+setgid {{ group }}
 
-chdir /opt/gogs
-env HOME=/opt/gogs/.ssh
-env USER=gogs
+chdir {{ home }}
+env HOME={{ home }}
+env USER={{ user }}
 
-exec /opt/gogs/gogs web --config /opt/gogs/custom/conf/app.ini
+exec {{ home }}/gogs web --config {{ home }}/custom/conf/app.ini
 

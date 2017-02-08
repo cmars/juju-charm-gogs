@@ -1,15 +1,24 @@
 import base64
 import os
-import shutil
 import re
 
 from charms.reactive import hook, when, when_not, set_state, remove_state, is_state
 from charmhelpers.core import hookenv
-from charmhelpers.core.host import add_group, adduser, service_running, service_start, service_restart
+from charmhelpers.core.host import add_group, adduser, service_running, service_start, service_restart, chownr
 from charmhelpers.core.templating import render
 from charmhelpers.fetch import archiveurl, apt_install, apt_update
 from charmhelpers.payload.archive import extract_tarfile
 from charmhelpers.core.unitdata import kv
+
+
+def get_install_context():
+    """ Gives the installation context
+    """
+    return {
+        'home': '/opt/gogs',
+        'user': 'gogs',
+        'group': 'gogs'
+    }
 
 
 def create_url(version):
@@ -23,6 +32,7 @@ def create_url(version):
 def install():
     conf = hookenv.config()
     version = conf.get('version', '0.9.97')
+    context = get_install_context()
 
     handler = archiveurl.ArchiveUrlFetchHandler()
     handler.download(create_url(version), dest='/opt/gogs.tar.gz')
@@ -30,23 +40,24 @@ def install():
     extract_tarfile('/opt/gogs.tar.gz', destpath="/opt")
 
     # Create gogs user & group
-    add_group("gogs")
-    adduser("gogs", system_user=True)
+    add_group(context['group'])
+    adduser(context['user'], system_user=True)
 
     for dir in ('.ssh', 'repositories', 'data', 'logs'):
-        os.makedirs(os.path.join("/opt/gogs", dir), mode=0o700, exist_ok=True)
-        shutil.chown(os.path.join("/opt/gogs", dir), user="gogs", group="gogs")
-    os.makedirs("/opt/gogs/custom/conf", mode=0o755, exist_ok=True)
-    shutil.chown("/opt/gogs/custom/conf", user="gogs", group="gogs")
+        os.makedirs(
+            os.path.join(context['home'], dir), mode=0o700, exist_ok=True)
+    os.makedirs(os.path.join(context['home'], 'custom', 'conf'),
+                mode=0o755, exist_ok=True)
+    chownr(context['home'], context['user'], context['group'], True, True)
 
     render(source='upstart',
            target="/etc/init/gogs.conf",
            perms=0o644,
-           context={})
+           context=context)
     render(source='gogs.service',
            target="/lib/systemd/system/gogs.service",
            perms=0o644,
-           context={})
+           context=context)
     hookenv.status_set('maintenance', 'installation complete')
 
 
@@ -94,6 +105,8 @@ def setup():
     if root and not root.endswith('/'):
         root = root + '/'
 
+    install_context = get_install_context()
+
     render(source='app.ini',
            target="/opt/gogs/custom/conf/app.ini",
            perms=0o644,
@@ -102,6 +115,8 @@ def setup():
                'db': unit_data.get('gogs.db'),
                'secret_key': secret_key,
                'root': root,
+               'home': install_context['home'],
+               'user': install_context['user'],
            })
     restart_service()
     hookenv.status_set('active', 'ready')

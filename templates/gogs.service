@@ -15,12 +15,12 @@ After=network.target
 #LimitMEMLOCK=infinity
 #LimitNOFILE=65535
 Type=simple
-User=gogs
-Group=gogs
-WorkingDirectory=/opt/gogs
-ExecStart=/opt/gogs/gogs web --config /opt/gogs/custom/conf/app.ini
+User={{ user }}
+Group={{ group }}
+WorkingDirectory={{ home }}
+ExecStart={{ home }}/gogs web --config {{ home }}/custom/conf/app.ini
 Restart=always
-Environment=USER=gogs HOME=/opt/gogs/.ssh
+Environment=USER={{ user }} HOME={{ home }}
 
 [Install]
 WantedBy=multi-user.target
