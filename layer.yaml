@@ -8,3 +8,10 @@ options:
         packages:
          - '--no-install-recommends'
          - git
+ignore:
+ - builds
+ - deps
+ - tests
+ - trusty
+ - xenial
+ - .*.swp
