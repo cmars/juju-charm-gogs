@@ -1,11 +1,10 @@
 import base64
 import os
-import shutil
 import re
 
 from charms.reactive import hook, when, when_not, set_state, remove_state, is_state
 from charmhelpers.core import hookenv
-from charmhelpers.core.host import add_group, adduser, service_running, service_start, service_restart
+from charmhelpers.core.host import add_group, adduser, service_running, service_start, service_restart, chownr
 from charmhelpers.core.templating import render
 from charmhelpers.fetch import archiveurl, apt_install, apt_update
 from charmhelpers.payload.archive import extract_tarfile
@@ -23,6 +22,9 @@ def create_url(version):
 def install():
     conf = hookenv.config()
     version = conf.get('version', '0.9.97')
+    home = "/opt/gogs"
+    user = "gogs"
+    group = "gogs"
 
     handler = archiveurl.ArchiveUrlFetchHandler()
     handler.download(create_url(version), dest='/opt/gogs.tar.gz')
@@ -30,14 +32,14 @@ def install():
     extract_tarfile('/opt/gogs.tar.gz', destpath="/opt")
 
     # Create gogs user & group
-    add_group("gogs")
-    adduser("gogs", system_user=True)
+    add_group(group)
+    adduser(user, system_user=True)
 
     for dir in ('.ssh', 'repositories', 'data', 'logs'):
-        os.makedirs(os.path.join("/opt/gogs", dir), mode=0o700, exist_ok=True)
-        shutil.chown(os.path.join("/opt/gogs", dir), user="gogs", group="gogs")
-    os.makedirs("/opt/gogs/custom/conf", mode=0o755, exist_ok=True)
-    shutil.chown("/opt/gogs/custom/conf", user="gogs", group="gogs")
+        os.makedirs(os.path.join(home, dir), mode=0o700, exist_ok=True)
+    os.makedirs(os.path.join(home, "custom", "conf"),
+                mode=0o755, exist_ok=True)
+    chownr(home, user, group, True, True)
 
     render(source='upstart',
            target="/etc/init/gogs.conf",

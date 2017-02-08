@@ -8,7 +8,7 @@ setuid gogs
 setgid gogs
 
 chdir /opt/gogs
-env HOME=/opt/gogs/.ssh
+env HOME=/opt/gogs
 env USER=gogs
 
 exec /opt/gogs/gogs web --config /opt/gogs/custom/conf/app.ini

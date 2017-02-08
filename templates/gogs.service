@@ -20,7 +20,7 @@ Group=gogs
 WorkingDirectory=/opt/gogs
 ExecStart=/opt/gogs/gogs web --config /opt/gogs/custom/conf/app.ini
 Restart=always
-Environment=USER=gogs HOME=/opt/gogs/.ssh
+Environment=USER=gogs HOME=/opt/gogs
 
 [Install]
 WantedBy=multi-user.target
