@@ -1,20 +1,15 @@
 
-ifndef JUJU_REPOSITORY
-	$(error JUJU_REPOSITORY is undefined)
-endif
-
 CHARM=cs:~cmars/gogs
-CHARMS=$(JUJU_REPOSITORY)/trusty/gogs $(JUJU_REPOSITORY)/xenial/gogs
-all: $(CHARMS)
+all: builds/gogs
 
-$(JUJU_REPOSITORY)/%/gogs:
-	charm build -s $*
+builds/gogs:
+	charm build
 
 push:
-	charm push $(JUJU_REPOSITORY)/trusty/gogs $(CHARM)
+	charm push builds/gogs $(CHARM)
 
 grant:
 	charm grant $(CHARM) --acl read everyone
 
 clean:
-	$(RM) -r $(CHARMS)
+	$(RM) -r builds deps
