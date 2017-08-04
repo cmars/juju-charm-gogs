@@ -12,6 +12,11 @@ requires:
 provides:
     website:
         interface: http
+resources:
+    bdist:
+        type: file
+        filename: gogs.tar.gz
+        description: Binary distribution of gogs, obtained from https://gogs.io
 series:
  - trusty
  - xenial

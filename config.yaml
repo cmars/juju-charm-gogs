@@ -11,10 +11,6 @@ options:
     type: boolean
     description: Force every new repository to be private
     default: false
-  version:
-    type: string
-    description: Gogs version to install
-    default: '0.9.97'
   host:
     type: string
     description: External host name

@@ -1,13 +1,13 @@
 import base64
 import os
 import re
+from subprocess import check_call
 
 from charms.reactive import hook, when, when_not, set_state, remove_state, is_state
 from charmhelpers.core import hookenv
 from charmhelpers.core.host import add_group, adduser, service_running, service_start, service_restart, chownr
 from charmhelpers.core.templating import render
 from charmhelpers.fetch import archiveurl, apt_install, apt_update
-from charmhelpers.payload.archive import extract_tarfile
 from charmhelpers.core.unitdata import kv
 
 
@@ -21,23 +21,12 @@ def get_install_context():
     }
 
 
-def create_url(version):
-    url = "https://cdn.gogs.io/gogs_%s_linux_amd64.tar.gz"
-    vpart = 'v' + version if re.match(r'\d+(\.\d+)+', version) else version
-
-    return url % vpart
-
-
 @hook('install')
 def install():
     conf = hookenv.config()
-    version = conf.get('version', '0.9.97')
     context = get_install_context()
-
-    handler = archiveurl.ArchiveUrlFetchHandler()
-    handler.download(create_url(version), dest='/opt/gogs.tar.gz')
-
-    extract_tarfile('/opt/gogs.tar.gz', destpath="/opt")
+    gogs_bdist = hookenv.resource_get('bdist')
+    check_call(["tar", "xzf", gogs_bdist], cwd="/opt")
 
     # Create gogs user & group
     add_group(context['group'])
